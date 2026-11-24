@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlatOut Online Save Editor — Edit Saves In-Browser</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
+
+  <!-- Google Fonts: Russo One & Rajdhani & Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Rajdhani:wght@600;700;800&family=Russo+One&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="forest">
+
+  <!-- Dynamic Particle Canvas -->
+  <canvas id="fire-canvas"></canvas>
+  <div class="bg-overlay"></div>
+  <div class="noise-overlay"></div>
+
+  <div class="app-wrapper">
+
+    <!-- ====================================================================
+         Header / Navigation Bar (No Audio)
+         ==================================================================== -->
+    <header class="site-header">
+      <div class="container nav-container">
+        
+        <a href="#editor" class="brand-logo">
+          <div class="logo-icon">🔥</div>
+          <div class="logo-text-group">
+            <span class="logo-title">FlatOut <span class="title-accent">Web Editor</span></span>
+            <span class="logo-sub" data-i18n="brandSub">ОНЛАЙН РЕДАКТОР СЕЙВОВ</span>
+          </div>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="#editor" class="nav-btn" data-i18n="navEditor">Редактор</a></li>
+          <li><a href="#faq" class="nav-btn" data-i18n="navFaq">FAQ</a></li>
+          <li><button id="btn-open-donate" class="nav-btn" type="button" data-i18n="navDonate">❤️ Поддержать</button></li>
+        </ul>
+
+        <div class="nav-controls">
+          <!-- Multi-Language Flag Dropdown -->
+          <div class="lang-dropdown" id="lang-dropdown">
+            <button class="lang-dropdown-btn" id="lang-dropdown-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Language">
+              <img src="icons/flag_en.svg" alt="Flag" class="lang-current-flag" id="lang-current-flag">
+              <span class="lang-current-name" id="lang-current-name">English</span>
+              <span class="lang-dropdown-arrow">▾</span>
+            </button>
+            <div class="lang-dropdown-menu" id="lang-dropdown-menu" role="menu">
+              <!-- Dynamically populated from LANGUAGES array -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <main>
+      <!-- ==================================================================
+           Hero Section & Online Editor Workspace
+           ================================================================== -->
+      <section id="editor" class="hero-section">
+        <div class="container">
+          
+          <div class="hero-badge" data-i18n="heroBadge">
+            ⚡ ОНЛАЙН РЕДАКТОР В БРАУЗЕРЕ • БЕЗ СКАЧИВАНИЯ
+          </div>
+
+          <h1 class="hero-title">
+            <span data-i18n="heroTitlePrefix">FLATOUT</span>
+            <span class="title-highlight" data-i18n="heroTitleHighlight">SAVE EDITOR</span>
+            <span data-i18n="heroTitleSuffix">ONLINE</span>
+          </h1>
+
+          <p class="hero-description" data-i18n="heroDesc">
+            Редактируйте сохранения FlatOut 1, FlatOut 2, FlatOut: Ultimate Carnage и FlatOut 4 прямо в браузере. Загрузите сейв, настройте деньги, гараж, 100% кубки или цвет ника и скачайте готовый файл!
+          </p>
+
+          <!-- File Dropzone & Editor Panel -->
+          <div class="editor-workspace">
+            
+            <!-- Hidden File Input (supports multiple files, e.g. player001.sav + options.sav) -->
+            <input type="file" id="file-input" style="display: none;" accept=".sav,.dat" multiple>
+
+            <!-- Empty State: Dropzone -->
+            <div id="dropzone-box" class="dropzone-container">
+              <div class="drop-icon-box">📁</div>
+              <h2 class="drop-title" data-i18n="dropTitle">ПЕРЕТАЩИТЕ СЮДА ФАЙЛ СОХРАНЕНИЯ</h2>
+              <p class="drop-subtitle" data-i18n="dropSub">
+                Поддерживаются файлы player*.sav, options.sav и Save.dat (можно выбрать оба файла FO2 сразу!)
+              </p>
+
+              <button class="btn-upload" type="button" onclick="document.getElementById('file-input').value=''; document.getElementById('file-input').click(); event.stopPropagation();" data-i18n="btnUpload">
+                📁 ВЫБРАТЬ ФАЙЛ НА КОМПЬЮТЕРЕ
+              </button>
+
+              <div class="demo-saves-row" onclick="event.stopPropagation()">
+                <span class="demo-label" data-i18n="demoLabel">Или попробуйте на демо-сейве:</span>
+                <button class="btn-demo-chip" type="button" onclick="loadDemoSave('fo1'); event.stopPropagation();">
+                  <img src="icons/fo1.png" alt="FlatOut 1" class="demo-game-icon">
+                  <span>FlatOut 1</span>
+                </button>
+                <button class="btn-demo-chip" type="button" onclick="loadDemoSave('fo2'); event.stopPropagation();">
+                  <img src="icons/fo2.png" alt="FlatOut 2" class="demo-game-icon">
+                  <span>FlatOut 2</span>
+                </button>
+                <button class="btn-demo-chip" type="button" onclick="loadDemoSave('fouc'); event.stopPropagation();">
+                  <img src="icons/fouc.png" alt="FlatOut: UC" class="demo-game-icon">
+                  <span>FlatOut: UC</span>
+                </button>
+                <button class="btn-demo-chip" type="button" onclick="loadDemoSave('fo4'); event.stopPropagation();">
+                  <img src="icons/fo4.png" alt="FlatOut 4" class="demo-game-icon">
+                  <span>FlatOut 4</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Active State: Interactive Editor Panel -->
+            <div id="editor-panel" class="active-editor-panel">
+              
+              <!-- Editor Header Bar -->
+              <div class="editor-header-bar">
+                <div class="loaded-file-info">
+                  <span id="loaded-type-badge" class="file-type-badge"><img src="icons/fo2.png" alt="FlatOut 2" class="badge-game-icon"> <span>FlatOut 2</span></span>
+                  <div>
+                    <span id="loaded-filename" class="file-name-text">player001.sav</span>
+                    <span id="loaded-filesize" class="file-size-text">(16 384 bytes)</span>
+                  </div>
+                </div>
+
+                <div class="editor-actions-top">
+                  <button id="btn-change-file" class="btn-change-file" type="button" data-i18n="btnChangeFile">
+                    🔄 Загрузить другой файл
+                  </button>
+                </div>
+              </div>
+
+              <!-- Editor Navigation Tabs -->
+              <div class="editor-tabs-nav">
+                <button class="ed-tab-btn active" data-tab="profile" data-i18n="tabProfile">👤 Профиль и Деньги</button>
+                <button class="ed-tab-btn" data-tab="garage" data-i18n="tabGarage">🚗 Гараж и Автомобили</button>
+                <button class="ed-tab-btn" data-tab="cups" data-i18n="tabCups">🏆 Кубки и Карьера</button>
+                <button id="tab-btn-stunts" class="ed-tab-btn" data-tab="stunts" data-i18n="tabStunts">🎳 Зал Славы (options.sav)</button>
+                <button class="ed-tab-btn" data-tab="stats" data-i18n="tabStats">💥 Трюки и Рекорды</button>
+              </div>
+
+              <!-- TAB 1: Profile & Money -->
+              <div id="ed-tab-profile" class="editor-tab-body active">
+                <div class="ed-card">
+                  <div class="ed-card-title" data-i18n="cardNickTitle">👤 Никнейм игрока и Цвет шрифта</div>
+                  
+                  <div class="form-grid-2">
+                    <div>
+                      <div class="form-group">
+                        <label class="form-label" data-i18n="lblNick">Никнейм игрока (с кодом цвета):</label>
+                        <input type="text" id="ed-nick-input" class="form-input" value="Player" maxlength="24">
+                      </div>
+
+                      <div class="form-group" style="margin-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                          <label class="form-label" style="margin-bottom: 0;" data-i18n="lblSliderColor">Ползунок выбора цвета ника:</label>
+                          <span id="slider-color-info" style="font-weight: 700; font-size: 0.85rem; color: var(--accent-primary);" data-i18n="colorStandard">Standard (no code)</span>
+                        </div>
+                        <input type="range" id="ed-color-slider" min="0" max="18" value="0" class="theme-slider" style="width: 100%; cursor: pointer;">
+                      </div>
+
+                      <div class="form-group">
+                        <label class="form-label" data-i18n="lblNickColor">Палитра цветов шрифта:</label>
+                        <div id="ed-palette-grid" class="palette-grid">
+                          <!-- Filled from JS -->
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Live Badge Plate -->
+                    <div class="badge-preview-container">
+                      <div class="ingame-plate">
+                        <div id="ed-plate-nickname" class="plate-nickname">Player</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ed-card">
+                  <div class="ed-card-title" data-i18n="cardMoneyTitle">💰 Финансы и Деньги в карьере</div>
+                  
+                  <div class="form-group">
+                    <label class="form-label" data-i18n="lblMoney">Деньги в карьере (Cr):</label>
+                    <input type="number" id="ed-money-input" class="form-input" value="50000" style="max-width: 320px;">
+                    
+                    <div class="quick-buttons-row">
+                      <button class="btn-quick" type="button" onclick="applyQuickMoney(50000)">+ 50 000 Cr</button>
+                      <button class="btn-quick" type="button" onclick="applyQuickMoney(250000)">+ 250 000 Cr</button>
+                      <button class="btn-quick" type="button" onclick="applyQuickMoney(1000000)">+ 1 000 000 Cr</button>
+                      <button class="btn-quick gold-btn" type="button" onclick="setMaxMoney(9999999)" data-i18n="btnMaxMoney">💰 МАКСИМУМ (9 999 999 Cr)</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 2: Cars & Garage -->
+              <div id="ed-tab-garage" class="editor-tab-body">
+                <div id="ed-garage-container">
+                  <!-- Dynamically populated based on game -->
+                </div>
+              </div>
+
+              <!-- TAB 3: Cups & Career -->
+              <div id="ed-tab-cups" class="editor-tab-body">
+                <div id="ed-cups-container">
+                  <!-- Dynamically populated based on game -->
+                </div>
+              </div>
+
+              <!-- TAB 4: Stunts (options.sav & FO2) -->
+              <div id="ed-tab-stunts" class="editor-tab-body">
+                <div id="ed-stunts-container">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+              <!-- TAB 5: Stats & Records -->
+              <div id="ed-tab-stats" class="editor-tab-body">
+                <div id="ed-stats-container">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+              <!-- Bottom Bar: Export & Download -->
+              <div class="editor-bottom-bar">
+                <div class="export-status-info">
+                  <span>🟢</span>
+                  <span data-i18n="statusReady">Файл проверен • CRC-32 рассчитан • Готов к игре</span>
+                </div>
+
+                <button class="btn-download-save" type="button" onclick="downloadCurrentSave()">
+                  <span data-i18n="btnDownloadSave">💾 СКАЧАТЬ ОБНОВЛЕННЫЙ СЕЙВ</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+
+
+      <!-- ==================================================================
+           FAQ & Save Locations
+           ================================================================== -->
+      <section id="faq" class="section-wrapper">
+        <div class="container">
+          
+          <div class="section-header">
+            <div class="section-tag" data-i18n="faqTag">РУКОВОДСТВО</div>
+            <h2 class="section-title" data-i18n="faqTitle">ГДЕ ИСКАТЬ ФАЙЛЫ СОХРАНЕНИЙ</h2>
+          </div>
+
+          <div class="accordion">
+            
+            <div class="acc-item active">
+              <div class="acc-header">
+                <span class="acc-title" data-i18n="faqQ1">Где находятся сохранения для каждой части?</span>
+                <span class="acc-icon">+</span>
+              </div>
+              <div class="acc-content" data-i18n="faqA1">
+                <strong>FlatOut 1:</strong> <code>...\FlatOut\Savegame\player*.sav</code><br>
+                <strong>FlatOut 2:</strong> <code>...\FlatOut 2\Savegame\player*.sav</code> и <code>options.sav</code><br>
+                <strong>FlatOut UC:</strong> <code>%LOCALAPPDATA%\FlatOut Ultimate Carnage\Savegame\player_*.sav</code><br>
+                <strong>FlatOut 4:</strong> <code>...\Steam\userdata\ВашID\402130\remote\Save.dat</code>
+              </div>
+            </div>
+
+            <div class="acc-item">
+              <div class="acc-header">
+                <span class="acc-title" data-i18n="faqQ2">Как применить скачанный сейв?</span>
+                <span class="acc-icon">+</span>
+              </div>
+              <div class="acc-content" data-i18n="faqA2">
+                Просто скопируйте скачанный файл обратно в папку Savegame вашей игры (заменив старый файл). На всякий случай сделайте копию старого файла.
+              </div>
+            </div>
+
+            <div class="acc-item">
+              <div class="acc-header">
+                <span class="acc-title" data-i18n="faqQ3">Работают ли открытые машины и никнейм в мультиплеере?</span>
+                <span class="acc-icon">+</span>
+              </div>
+              <div class="acc-content" data-i18n="faqA3">
+                Да! Вы можете играть в сетевых заездах и лобби со всеми открытыми машинами, тюнингом деталей и цветным ником.
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ==================================================================
+         Footer
+         ================================================================== -->
+    <footer class="site-footer">
+      <div class="container">
+        <p class="footer-text" data-i18n="footerRights">
+          © 2026 FlatOut Online Save Editor. Создано с любовью для фанатов серии FlatOut.
+        </p>
+        <p class="footer-sub" data-i18n="footerNote">
+          FlatOut является товарным знаком Bugbear Entertainment и Strategy First. Онлайн-редактор работает локально в вашем браузере.
+        </p>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ==================================================================
+       Support / Donate Modal (Crypto & Support Dialog)
+       ================================================================== -->
+  <div id="donate-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="donate-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="modal-header-icon">❤️</div>
+          <div>
+            <h2 id="donate-title" class="modal-title" data-i18n="donateModalTitle">ПОДДЕРЖКА И РАЗВИТИЕ ПРОЕКТА</h2>
+            <p class="modal-subtitle" data-i18n="donateModalSub">
+              Все функции редактора бесплатны. Если проект сэкономил ваше время, вы можете поддержать автора любой суммой в удобной криптовалюте или сети.
+            </p>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" id="donate-close-btn" aria-label="Close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="crypto-grid">
+          
+          <!-- USDT -->
+          <div class="crypto-card">
+            <div class="crypto-card-top">
+              <div class="crypto-coin-info">
+                <img src="icons/crypto/usdt.png" alt="USDT" class="crypto-icon">
+                <div>
+                  <div class="crypto-name">Tether (USDT)</div>
+                  <div class="crypto-memo" data-i18n="usdtMemo">Сеть Tron (TRC-20)</div>
+                </div>
+              </div>
+              <span class="crypto-badge" style="color: #2dd4bf; background: #134e4a;">TRC-20</span>
+            </div>
+            <div class="crypto-address-box">
+              <span class="crypto-address-text" id="addr-usdt">TCWJUkWNk3D2pdXzb5twR5UQC5bCWok6Eq</span>
+              <button type="button" class="crypto-copy-btn" onclick="copyCryptoAddress('addr-usdt', this)">
+                📋 <span data-i18n="btnCopy">Копировать</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- TON -->
+          <div class="crypto-card">
+            <div class="crypto-card-top">
+              <div class="crypto-coin-info">
+                <img src="icons/crypto/ton.png" alt="TON" class="crypto-icon">
+                <div>
+                  <div class="crypto-name">TON</div>
+                  <div class="crypto-memo" data-i18n="tonMemo">Telegram Wallet / Tonkeeper</div>
+                </div>
+              </div>
+              <span class="crypto-badge" style="color: #38bdf8; background: #0c4a6e;">TON Network</span>
+            </div>
+            <div class="crypto-address-box">
+              <span class="crypto-address-text" id="addr-ton">UQD4TaDSzYbzPxkKB-HdlqZZja2w9Jihhra5OWtzYDU7hgu1</span>
+              <button type="button" class="crypto-copy-btn" onclick="copyCryptoAddress('addr-ton', this)">
+                📋 <span data-i18n="btnCopy">Копировать</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- BTC -->
+          <div class="crypto-card">
+            <div class="crypto-card-top">
+              <div class="crypto-coin-info">
+                <img src="icons/crypto/btc.png" alt="Bitcoin" class="crypto-icon">
+                <div>
+                  <div class="crypto-name">Bitcoin (BTC)</div>
+                  <div class="crypto-memo" data-i18n="btcMemo">Основная сеть Bitcoin (SegWit)</div>
+                </div>
+              </div>
+              <span class="crypto-badge" style="color: #fbbf24; background: #78350f;">BTC</span>
+            </div>
+            <div class="crypto-address-box">
+              <span class="crypto-address-text" id="addr-btc">bc1qz69c0sqygwrqer6sz9n22hhv28dsqsfyhj6t3n</span>
+              <button type="button" class="crypto-copy-btn" onclick="copyCryptoAddress('addr-btc', this)">
+                📋 <span data-i18n="btnCopy">Копировать</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- ETH -->
+          <div class="crypto-card">
+            <div class="crypto-card-top">
+              <div class="crypto-coin-info">
+                <img src="icons/crypto/eth.png" alt="Ethereum" class="crypto-icon">
+                <div>
+                  <div class="crypto-name">Ethereum (ETH)</div>
+                  <div class="crypto-memo" data-i18n="ethMemo">Сеть Ethereum (ERC-20)</div>
+                </div>
+              </div>
+              <span class="crypto-badge" style="color: #c084fc; background: #581c87;">ERC-20</span>
+            </div>
+            <div class="crypto-address-box">
+              <span class="crypto-address-text" id="addr-eth">0x386D7aaFD634ce54b046B9b270BAB7234251CC05</span>
+              <button type="button" class="crypto-copy-btn" onclick="copyCryptoAddress('addr-eth', this)">
+                📋 <span data-i18n="btnCopy">Копировать</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- SOL -->
+          <div class="crypto-card">
+            <div class="crypto-card-top">
+              <div class="crypto-coin-info">
+                <img src="icons/crypto/sol.png" alt="Solana" class="crypto-icon">
+                <div>
+                  <div class="crypto-name">Solana (SOL)</div>
+                  <div class="crypto-memo" data-i18n="solMemo">Сеть Solana (SPL)</div>
+                </div>
+              </div>
+              <span class="crypto-badge" style="color: #14f195; background: #022c22;">SOL</span>
+            </div>
+            <div class="crypto-address-box">
+              <span class="crypto-address-text" id="addr-sol">CkmsWLXw4szNUZXB3C984bZ89CW2RD4Yx4M69zbPrXbp</span>
+              <button type="button" class="crypto-copy-btn" onclick="copyCryptoAddress('addr-sol', this)">
+                📋 <span data-i18n="btnCopy">Копировать</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- BNB -->
+          <div class="crypto-card">
+            <div class="crypto-card-top">
+              <div class="crypto-coin-info">
+                <img src="icons/crypto/bnb.png" alt="BNB" class="crypto-icon">
+                <div>
+                  <div class="crypto-name">BNB</div>
+                  <div class="crypto-memo" data-i18n="bnbMemo">Сеть BNB Smart Chain (BEP-20)</div>
+                </div>
+              </div>
+              <span class="crypto-badge" style="color: #f0b90b; background: #453200;">BEP-20</span>
+            </div>
+            <div class="crypto-address-box">
+              <span class="crypto-address-text" id="addr-bnb">0x386D7aaFD634ce54b046B9b270BAB7234251CC05</span>
+              <button type="button" class="crypto-copy-btn" onclick="copyCryptoAddress('addr-bnb', this)">
+                📋 <span data-i18n="btnCopy">Копировать</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <span data-i18n="donateFooterHint">💡 Кликните по кнопке рядом с адресом для копирования • Esc для закрытия</span>
+        <button type="button" class="nav-btn" onclick="closeDonateModal()" data-i18n="btnClose">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="locales.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

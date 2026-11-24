@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="32" height="24">
+  <rect width="256" height="480" fill="#006600"/>
+  <rect x="256" width="384" height="480" fill="#FF0000"/>
+  <g transform="translate(256, 240)">
+    <!-- Armillary Sphere in Gold -->
+    <circle r="88" fill="none" stroke="#FFCC00" stroke-width="10"/>
+    <circle r="72" fill="none" stroke="#FFCC00" stroke-width="5"/>
+    <ellipse rx="72" ry="30" fill="none" stroke="#FFCC00" stroke-width="6"/>
+    <line x1="0" y1="-88" x2="0" y2="88" stroke="#FFCC00" stroke-width="8"/>
+    <line x1="-88" y1="0" x2="88" y2="0" stroke="#FFCC00" stroke-width="8"/>
+    <line x1="-62" y1="-62" x2="62" y2="62" stroke="#FFCC00" stroke-width="10"/>
+    <!-- Portuguese Shield -->
+    <path d="M -42,-48 H 42 V 15 Q 42 68 0 85 Q -42 68 -42 15 Z" fill="#FF0000" stroke="#FFFFFF" stroke-width="4"/>
+    <!-- Inner White Shield -->
+    <path d="M -26,-36 H 26 V 8 Q 26 50 0 64 Q -26 50 -26 8 Z" fill="#FFFFFF"/>
+    <!-- 5 Blue Quinas (Cross pattern) -->
+    <g fill="#003399">
+      <!-- Center -->
+      <path d="M -6,-10 H 6 V 2 Q 6 10 0 14 Q -6 10 -6 2 Z"/>
+      <!-- Top -->
+      <path d="M -6,-28 H 6 V -16 Q 6 -8 0 -4 Q -6 -8 -6 -16 Z"/>
+      <!-- Bottom -->
+      <path d="M -6,8 H 6 V 20 Q 6 28 0 32 Q -6 28 -6 20 Z"/>
+      <!-- Left -->
+      <path d="M -20,-10 H -8 V 2 Q -8 10 -14 14 Q -20 10 -20 2 Z"/>
+      <!-- Right -->
+      <path d="M 8,-10 H 20 V 2 Q 20 10 14 14 Q 8 10 8 2 Z"/>
+    </g>
+    <!-- Castles on Red Border -->
+    <g fill="#FFCC00">
+      <rect x="-38" y="-45" width="10" height="10"/>
+      <rect x="-5" y="-45" width="10" height="10"/>
+      <rect x="28" y="-45" width="10" height="10"/>
+      <rect x="-38" y="-10" width="10" height="10"/>
+      <rect x="28" y="-10" width="10" height="10"/>
+      <rect x="-28" y="32" width="10" height="10"/>
+      <rect x="18" y="32" width="10" height="10"/>
+    </g>
+  </g>
+</svg>
