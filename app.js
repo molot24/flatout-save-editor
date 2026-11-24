@@ -273,7 +273,7 @@ function parseSaveData(bytes, filename) {
     money = view.getUint32(0x50, true);
   } else if (gt === "fo4") {
     nick = "Player 1";
-    money = view.getUint32(0x3C4, true);
+    money = bytes.length >= 0x3834 ? view.getUint32(0x3830, true) : view.getUint32(0x3C4, true);
   } else if (gt === "options") {
     nick = "Hall of Fame";
     money = 0;
@@ -2025,7 +2025,17 @@ function syncMoneyToBuffer(val) {
   if (gt === "fo1") currentSave.view.setUint32(0x84, safeVal, true);
   else if (gt === "fo2") currentSave.view.setUint32(0x48, safeVal, true);
   else if (gt === "fouc") currentSave.view.setUint32(0x50, safeVal, true);
-  else if (gt === "fo4") currentSave.view.setUint32(0x3C4, safeVal, true);
+  else if (gt === "fo4") {
+    currentSave.view.setUint32(0x3C4, safeVal, true);
+    if (currentSave.rawBytes.length >= 0x3834) {
+      currentSave.view.setUint32(0x3830, safeVal, true);
+      currentSave.view.setUint32(0x382C, safeVal, true);
+    }
+    const curTotal = currentSave.view.getUint32(0x3B8, true);
+    if (safeVal > curTotal) {
+      currentSave.view.setUint32(0x3B8, safeVal, true);
+    }
+  }
 }
 
 // ==============================================================================
