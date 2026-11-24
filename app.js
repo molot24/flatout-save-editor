@@ -59,12 +59,12 @@ const CRC_TABLE = new Uint32Array([
 ]);
 
 function calculateFoucCrc(dataBytes) {
-  let crc = 0xFFFFFFFF;
+  let crc = 0;
   for (let i = 0; i < dataBytes.length; i++) {
-    const tableIndex = (crc ^ dataBytes[i]) & 0xFF;
-    crc = (crc >>> 8) ^ CRC_TABLE[tableIndex];
+    const tableIndex = (dataBytes[i] ^ (crc & 0xFF)) & 0xFF;
+    crc = ((crc >>> 8) ^ CRC_TABLE[tableIndex]) >>> 0;
   }
-  return (crc ^ 0xFFFFFFFF) >>> 0;
+  return crc >>> 0;
 }
 
 // ==============================================================================
@@ -236,9 +236,15 @@ function detectGameType(bytes, filename) {
     return "fo2";
   }
 
-  // 4. FlatOut: Ultimate Carnage (24 576 bytes, starts with CRC-32)
-  if (size === 24576) {
-    return "fouc";
+  // 4. FlatOut: Ultimate Carnage (player_*.sav, typically 20KB - 150KB)
+  if (lowerName.startsWith("player_") || (size >= 20000 && size <= 150000)) {
+    if (size >= 1024) {
+      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+      const storedCrc = view.getUint32(4, true);
+      if (calculateFoucCrc(bytes.subarray(8)) === storedCrc) {
+        return "fouc";
+      }
+    }
   }
 
   // 5. FlatOut 4: Total Insanity (Save.dat, 2 080 bytes)
@@ -2022,10 +2028,31 @@ function syncMoneyToBuffer(val) {
   if (!currentSave.view) return;
   const safeVal = Math.min(999999999, Math.max(0, val || 0));
   const gt = currentSave.gameType;
-  if (gt === "fo1") currentSave.view.setUint32(0x84, safeVal, true);
-  else if (gt === "fo2") currentSave.view.setUint32(0x48, safeVal, true);
-  else if (gt === "fouc") currentSave.view.setUint32(0x50, safeVal, true);
-  else if (gt === "fo4") {
+  if (gt === "fo1") {
+    currentSave.view.setUint32(0x84, safeVal, true);
+    if (currentSave.rawBytes.length >= 0xC8) {
+      const curEarned = currentSave.view.getUint32(0xC4, true);
+      if (safeVal > curEarned) {
+        currentSave.view.setUint32(0xC4, safeVal, true);
+      }
+    }
+  } else if (gt === "fo2") {
+    currentSave.view.setUint32(0x48, safeVal, true);
+    if (currentSave.rawBytes.length >= 0x124) {
+      const curEarned = currentSave.view.getUint32(0x120, true);
+      if (safeVal > curEarned) {
+        currentSave.view.setUint32(0x120, safeVal, true);
+      }
+    }
+  } else if (gt === "fouc") {
+    currentSave.view.setUint32(0x50, safeVal, true);
+    if (currentSave.rawBytes.length >= 0x120) {
+      const curEarned = currentSave.view.getUint32(0x11C, true);
+      if (safeVal > curEarned) {
+        currentSave.view.setUint32(0x11C, safeVal, true);
+      }
+    }
+  } else if (gt === "fo4") {
     if (currentSave.rawBytes.length >= 0x0B5C) {
       currentSave.view.setUint32(0x0B58, safeVal, true);
     }
