@@ -273,7 +273,7 @@ function parseSaveData(bytes, filename) {
     money = view.getUint32(0x50, true);
   } else if (gt === "fo4") {
     nick = "Player 1";
-    money = bytes.length >= 0x3834 ? view.getUint32(0x3830, true) : view.getUint32(0x3C4, true);
+    money = view.getUint32(0x0B58, true) || (bytes.length >= 0x3834 ? view.getUint32(0x3830, true) : view.getUint32(0x3C4, true));
   } else if (gt === "options") {
     nick = "Hall of Fame";
     money = 0;
@@ -2026,6 +2026,9 @@ function syncMoneyToBuffer(val) {
   else if (gt === "fo2") currentSave.view.setUint32(0x48, safeVal, true);
   else if (gt === "fouc") currentSave.view.setUint32(0x50, safeVal, true);
   else if (gt === "fo4") {
+    if (currentSave.rawBytes.length >= 0x0B5C) {
+      currentSave.view.setUint32(0x0B58, safeVal, true);
+    }
     currentSave.view.setUint32(0x3C4, safeVal, true);
     if (currentSave.rawBytes.length >= 0x3834) {
       currentSave.view.setUint32(0x3830, safeVal, true);
