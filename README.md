@@ -1,6 +1,6 @@
 # 🚗 FlatOut Online Save Editor (Web Edition)
 
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-brightgreen?logo=github)](https://github.com)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-brightgreen?logo=github)](https://molot24.github.io/flatout-save-editor/)
 [![Languages](https://img.shields.io/badge/Languages-15%20Locales-blue)](locales.js)
 [![Zero Dependencies](https://img.shields.io/badge/Dependencies-Zero%20(Pure%20Vanilla%20JS)-orange)]()
 [![Platform](https://img.shields.io/badge/Platform-Web%20%2F%20In--Browser-red)]()
@@ -10,9 +10,11 @@ A high-performance, responsive, browser-based savegame editor for the legendary 
 
 ---
 
-## 🌟 Live Demo
+## 🌟 Live Online Demo
 
-👉 **Online Web Editor:** `https://<YOUR_GITHUB_USERNAME>.github.io/<YOUR_REPO_NAME>/`
+👉 **Launch Web Editor:** **[https://molot24.github.io/flatout-save-editor/](https://molot24.github.io/flatout-save-editor/)**
+
+*(Compatible with all modern browsers on PC, Mac, Linux & mobile • 100% Free • Works offline once loaded)*
 
 ---
 
@@ -23,14 +25,14 @@ A high-performance, responsive, browser-based savegame editor for the legendary 
 | **FlatOut 1** (2004) | `player*.sav` (8 KB) | Profile money, active car selector, Stage 3 Pro upgrades, unlock all 16 cars, 36 division races (100% Gold), 36 track records. |
 | **FlatOut 2** (2006) | `player*.sav` (16 KB)<br>`options.sav` (131 KB) | Colored nickname live-preview & palette slider, career money, unlock Derby/Race/Street classes, 56 cups 100% Gold, garage manager (43 cars max tune / dealership / stock reset), Hall of Fame Stunts (12 mini-games world records). |
 | **FlatOut: Ultimate Carnage** | `player_*.sav` (~94 KB) | Automated **CRC-32 recalculation**, color nickname, money, 44 cars garage & upgrades, 100% Gold in Career & Carnage Mode (36 events), stats & track records. |
-| **FlatOut 4: Total Insanity** | `Save.dat` (~21 KB) | Profile money, unlock all cars/skins/arenas, maximum wins, stunt & destruction records. |
+| **FlatOut 4: Total Insanity** | `Save.dat` (~21 KB) | Career & Garage credits (`0x0B58`), unlock all cars/skins/arenas, maximum wins, stunt & destruction records. |
 
 ---
 
 ## ✨ Key Highlights
 
-- **🔒 100% Client-Side Privacy:** Your savegame files are processed locally in your browser memory using JavaScript `DataView` and typed arrays. No files are uploaded to any server.
-- **⚡ Automated CRC-32 Recalculation:** FlatOut: Ultimate Carnage saves require a custom CRC-32 header verification (`0x312e30`). The editor automatically recalculates and writes valid checksums so the game accepts the save with zero corruption warnings.
+- **🔒 100% Client-Side Privacy:** Your savegame files are processed locally in your browser memory using JavaScript `DataView` and typed arrays. Zero data leaves your computer.
+- **⚡ Automated CRC-32 Recalculation:** FlatOut: Ultimate Carnage saves require custom CRC-32 header verification (`0x312e30`). The editor automatically recalculates and writes valid checksums so the game accepts the save without corruption warnings.
 - **🎨 Interactive Colored Nickname Builder:** Real-time preview plate recreating the in-game lobby font styles and original game color codes (`#7`, `#40`, `#31`, `#46`, `#999`, etc.) with a slider and palette selector.
 - **📦 Multi-File & Combined Save Support:** FlatOut 2 stores career in `player001.sav` and stunt records in `options.sav`. You can drag and drop both files simultaneously or attach `options.sav` on the fly.
 - **🎮 Built-In Demo Saves:** Test all features instantly with one click using embedded demo saves for FlatOut 1, 2, UC, and 4.
@@ -44,8 +46,8 @@ A high-performance, responsive, browser-based savegame editor for the legendary 
 
 | Game | Default Savegame Path on Windows |
 | :--- | :--- |
-| **FlatOut 1** | `...\FlatOut\Savegame\player001.sav` |
-| **FlatOut 2** | `...\FlatOut 2\Savegame\player001.sav` and `options.sav` |
+| **FlatOut 1** | `...\Steam\steamapps\common\FlatOut\Savegame\player001.sav` |
+| **FlatOut 2** | `...\Steam\steamapps\common\FlatOut 2\Savegame\player001.sav` and `options.sav` |
 | **FlatOut: UC** | `%LOCALAPPDATA%\FlatOut Ultimate Carnage\Savegame\player_*.sav` |
 | **FlatOut 4** | `...\Steam\userdata\<YourSteamID>\402130\remote\Save.dat` |
 
@@ -55,9 +57,9 @@ A high-performance, responsive, browser-based savegame editor for the legendary 
 
 You don't need any build steps, npm, node, or web servers:
 
-1. Clone or download this repository:
+1. Clone this repository:
    ```bash
-   git clone https://github.com/<YOUR_GITHUB_USERNAME>/<YOUR_REPO_NAME>.git
+   git clone https://github.com/molot24/flatout-save-editor.git
    ```
 2. Double-click `index.html` to open it directly in any modern browser (Chrome, Firefox, Edge, Safari, Opera).
 
@@ -67,11 +69,7 @@ You don't need any build steps, npm, node, or web servers:
 
 This repository includes a ready-to-use GitHub Actions workflow located in [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
 
-### Quick Deployment Steps:
-1. Push this repository to your GitHub account.
-2. In your GitHub repository, navigate to **Settings** → **Pages**.
-3. Under **Build and deployment** → **Source**, select **GitHub Actions**.
-4. The deployment workflow will run automatically on every push to `main` and publish the site.
+Every push to the `main` branch automatically deploys and updates the live web application on GitHub Pages.
 
 ---
 
