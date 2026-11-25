@@ -23,7 +23,7 @@ A high-performance, responsive, browser-based savegame editor for the legendary 
 | **FlatOut 1** (2004) | `player*.sav` (8 KB) | Profile money, active car selector, Stage 3 Pro upgrades, unlock all 16 cars, 36 division races (100% Gold), 36 track records. |
 | **FlatOut 2** (2006) | `player*.sav` (16 KB)<br>`options.sav` (131 KB) | Colored nickname live-preview & palette slider, career money, unlock Derby/Race/Street classes, 56 cups 100% Gold, garage manager (43 cars max tune / dealership / stock reset), Hall of Fame Stunts (12 mini-games world records). |
 | **FlatOut: Ultimate Carnage** | `player_*.sav` (~94 KB) | Automated **CRC-32 recalculation**, color nickname, money, 44 cars garage & upgrades, 100% Gold in Career & Carnage Mode (36 events), stats & track records. |
-| **FlatOut 4: Total Insanity** | `Save.dat` (~21 KB) | Career & Garage credits (`0x0B58`), unlock all cars/skins/arenas, maximum wins, stunt & destruction records. |
+| **FlatOut 4: Total Insanity** | `Save.dat` (~21 KB) | Career & Garage credits, unlock all cars/skins/arenas, maximum wins, stunt & destruction records. |
 
 ---
 
