@@ -10,8 +10,6 @@ A high-performance, responsive, browser-based savegame editor for the legendary 
 
 ---
 
-## 🌟 Live Online Demo
-
 👉 **Launch Web Editor:** **[https://molot24.github.io/flatout-save-editor/](https://molot24.github.io/flatout-save-editor/)**
 
 *(Compatible with all modern browsers on PC, Mac, Linux & mobile • 100% Free • Works offline once loaded)*
