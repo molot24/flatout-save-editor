@@ -1700,20 +1700,24 @@ function renderStatsSection() {
   const gt = currentSave.gameType;
 
   if (gt === "fo2" || gt === "fouc") {
+    const offMap = gt === "fouc"
+      ? { totalEarn: 0x11C, cupEarn: 0x120, crashEarn: 0x124, totalSpent: 0x128, races: 0x12C, meters: 0xC52 }
+      : { totalEarn: 0x120, cupEarn: 0x124, crashEarn: 0x128, totalSpent: 0x12C, races: 0x148, meters: 0xE32 };
+
     const whammo = currentSave.view.getUint32(0x138, true);
     const superflip = currentSave.view.getUint32(0x13C, true);
     const blastout = currentSave.view.getUint32(0x140, true);
     const bigair = currentSave.view.getUint32(0x144, true);
 
-    const totalEarn = currentSave.view.getUint32(0x120, true);
-    const cupEarn = currentSave.view.getUint32(0x124, true);
-    const crashEarn = currentSave.view.getUint32(0x128, true);
-    const totalSpent = currentSave.view.getUint32(0x12C, true);
+    const totalEarn = currentSave.view.getUint32(offMap.totalEarn, true);
+    const cupEarn = currentSave.view.getUint32(offMap.cupEarn, true);
+    const crashEarn = currentSave.view.getUint32(offMap.crashEarn, true);
+    const totalSpent = currentSave.view.getUint32(offMap.totalSpent, true);
 
-    const races = currentSave.view.getUint32(0x148, true);
+    const races = currentSave.view.getUint32(offMap.races, true);
     const wins = currentSave.view.getUint32(0x130, true);
     const secPlaces = currentSave.view.getUint32(0x134, true);
-    const meters = gt === "fo2" && 0xE32 + 4 <= currentSave.rawBytes.length ? currentSave.view.getFloat32(0xE32, true) : 2500000.0;
+    const meters = offMap.meters + 4 <= currentSave.rawBytes.length ? currentSave.view.getFloat32(offMap.meters, true) : 2500000.0;
 
     container.innerHTML = `
       <div class="master-actions-grid">
@@ -1753,7 +1757,7 @@ function renderStatsSection() {
         <div class="form-grid-2">
           <div class="form-group">
             <label class="form-label">${tr("lblTotalRaces", "Total Races Completed:")}</label>
-            <input type="number" id="ed-stat-races" class="form-input" value="${races}" onchange="updateRawStatUint32(0x148, this.value)">
+            <input type="number" id="ed-stat-races" class="form-input" value="${races}" onchange="updateRawStatUint32(${offMap.races}, this.value)">
           </div>
           <div class="form-group">
             <label class="form-label">${tr("lblVictories", "Race Victories (1st Place):")}</label>
@@ -1775,19 +1779,19 @@ function renderStatsSection() {
         <div class="form-grid-2">
           <div class="form-group">
             <label class="form-label">${tr("lblTotalEarned", "Total Career Earnings (Cr):")}</label>
-            <input type="number" id="ed-stat-earn" class="form-input" value="${totalEarn}" onchange="updateRawStatUint32(0x120, this.value)">
+            <input type="number" id="ed-stat-earn" class="form-input" value="${totalEarn}" onchange="updateRawStatUint32(${offMap.totalEarn}, this.value)">
           </div>
           <div class="form-group">
             <label class="form-label">${tr("lblCupEarned", "Cup Prize Money (Cr):")}</label>
-            <input type="number" id="ed-stat-cupearn" class="form-input" value="${cupEarn}" onchange="updateRawStatUint32(0x124, this.value)">
+            <input type="number" id="ed-stat-cupearn" class="form-input" value="${cupEarn}" onchange="updateRawStatUint32(${offMap.cupEarn}, this.value)">
           </div>
           <div class="form-group">
             <label class="form-label">${tr("lblCrashBonus", "Crash & Stunt Bonus Cash (Cr):")}</label>
-            <input type="number" id="ed-stat-crashearn" class="form-input" value="${crashEarn}" onchange="updateRawStatUint32(0x128, this.value)">
+            <input type="number" id="ed-stat-crashearn" class="form-input" value="${crashEarn}" onchange="updateRawStatUint32(${offMap.crashEarn}, this.value)">
           </div>
           <div class="form-group">
             <label class="form-label">${tr("lblTotalSpent", "Total Money Spent (Cr):")}</label>
-            <input type="number" id="ed-stat-spent" class="form-input" value="${totalSpent}" onchange="updateRawStatUint32(0x12C, this.value)">
+            <input type="number" id="ed-stat-spent" class="form-input" value="${totalSpent}" onchange="updateRawStatUint32(${offMap.totalSpent}, this.value)">
           </div>
         </div>
       </div>
@@ -1936,9 +1940,10 @@ function updateRawStatFloat32(offset, val) {
 }
 
 function updateFO2Distance(val) {
-  if (currentSave.gameType === "fo2" && 0xE32 + 4 <= currentSave.rawBytes.length) {
+  const off = currentSave.gameType === "fouc" ? 0xC52 : (currentSave.gameType === "fo2" ? 0xE32 : -1);
+  if (off !== -1 && off + 4 <= currentSave.rawBytes.length) {
     const num = parseFloat(val) || 4500000.0;
-    currentSave.view.setFloat32(0xE32, num, true);
+    currentSave.view.setFloat32(off, num, true);
     showToast(tr("toastOdometerUpdated", "Odometer updated!"));
   }
 }
@@ -1989,6 +1994,9 @@ function webSetProDestructionStats() {
     view.setUint32(0x13C, 800, true);
     view.setUint32(0x140, 150, true);
     view.setUint32(0x144, 1200, true);
+    if (0xC52 + 4 <= currentSave.rawBytes.length) {
+      view.setFloat32(0xC52, 5000000.0, true);
+    }
   }
   renderStatsSection();
   showToast(tr("toastFO2StatsSet", "💥 Stunts, crashes and destruction records set!"));
