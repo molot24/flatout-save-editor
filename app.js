@@ -395,6 +395,7 @@ function syncColorSliderWithNick() {
   const nick = currentSave.nickname;
   const match = nick.match(/^(#\d+)/);
   const code = match ? match[1] : "";
+  currentSave.colorCode = code;
 
   let matchedIdx = 0;
   for (let i = 0; i < COLOR_SPECTRUM.length; i++) {
@@ -539,6 +540,7 @@ function updateNicknameBadge() {
     plate.innerText = clean;
     plate.className = "plate-nickname rainbow-anim";
     plate.style.color = "transparent";
+    plate.style.textShadow = "none";
   } else {
     plate.innerText = clean;
     plate.className = "plate-nickname";
@@ -2150,12 +2152,12 @@ function downloadCurrentSave() {
   // 2. Sync Nickname
   const nickStr = document.getElementById("ed-nick-input").value.trim() || "Player";
   if (gt === "fo1") {
-    writeUtf16LE(bytes, 0x04, 32, nickStr);
-    writeUtf16LE(bytes, 0x62, 32, nickStr);
+    writeUtf16LE(bytes, 0x04, 16, nickStr);
+    writeUtf16LE(bytes, 0x62, 16, nickStr);
   } else if (gt === "fo2") {
-    writeUtf16LE(bytes, 0x04, 64, nickStr);
+    writeUtf16LE(bytes, 0x04, 32, nickStr);
   } else if (gt === "fouc") {
-    writeUtf16LE(bytes, 0x0C, 64, nickStr);
+    writeUtf16LE(bytes, 0x0C, 32, nickStr);
   }
 
   // 3. Checksum Recalculation for FlatOut: Ultimate Carnage
