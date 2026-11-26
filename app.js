@@ -269,13 +269,13 @@ function parseSaveData(bytes, filename) {
   let money = 0;
 
   if (gt === "fo1") {
-    nick = readUtf16LE(bytes, 0x04, 32) || "Player";
+    nick = readUtf16LE(bytes, 0x04, 16) || "Player";
     money = view.getUint32(0x84, true);
   } else if (gt === "fo2") {
-    nick = readUtf16LE(bytes, 0x04, 64) || "Player";
+    nick = readUtf16LE(bytes, 0x04, 32) || "Player";
     money = view.getUint32(0x48, true);
   } else if (gt === "fouc") {
-    nick = readUtf16LE(bytes, 0x0C, 64) || "Player";
+    nick = readUtf16LE(bytes, 0x0C, 32) || "Player";
     money = view.getUint32(0x50, true);
   } else if (gt === "fo4") {
     nick = "Player 1";
@@ -1612,7 +1612,7 @@ function renderStuntsSection() {
       if (readFl > 0 && readFl < 1000000) fl = readFl;
       const readCar = target.view.getUint32(s.off + 4, true);
       if (readCar >= 0 && readCar < FO2_CARS.length) carId = readCar;
-      const readN = readUtf16LE(target.rawBytes, s.off + 8, 32);
+      const readN = readUtf16LE(target.rawBytes, s.off + 8, 16);
       if (readN.trim()) rName = readN.trim();
     }
 
@@ -1644,7 +1644,7 @@ function updateStuntName(i, val) {
   const s = FO2_STUNTS[i];
   const target = getStuntsTarget();
   if (target && target.rawBytes && s.off + 40 <= target.rawBytes.length) {
-    writeUtf16LE(target.rawBytes, s.off + 8, 32, val.trim() || "Player");
+    writeUtf16LE(target.rawBytes, s.off + 8, 16, val.trim() || "Player");
     showToast(`Stunt #${i+1}: ${tr("toastRecordHolderUpdated", "record holder name updated!")}`);
   }
 }
@@ -1680,7 +1680,7 @@ function webSetAllWorldRecordsStunts() {
     if (s.off + 40 <= bytes.length) {
       view.setFloat32(s.off, s.defScore, true);
       view.setUint32(s.off + 4, s.car, true);
-      writeUtf16LE(bytes, s.off + 8, 32, name);
+      writeUtf16LE(bytes, s.off + 8, 16, name);
 
       const nameIn = document.getElementById(`stunt-name-${i}`);
       const scoreIn = document.getElementById(`stunt-score-${i}`);
@@ -1853,7 +1853,7 @@ function renderStatsSection() {
             <tbody>
               ${trackList.map((tname, i) => {
                 const off = 0x190 + i * 52;
-                let rName = readUtf16LE(currentSave.rawBytes, off, 24);
+                let rName = readUtf16LE(currentSave.rawBytes, off, 12);
                 let rTime = 45.0;
                 if (off + 28 <= currentSave.rawBytes.length) {
                   const rawT = currentSave.view.getFloat32(off + 24, true);
@@ -1953,7 +1953,7 @@ function updateFO2Distance(val) {
 function updateFO1RecordName(idx, val) {
   const off = 0x190 + idx * 52;
   if (off + 24 <= currentSave.rawBytes.length) {
-    writeUtf16LE(currentSave.rawBytes, off, 24, val.trim() || "PLAYER");
+    writeUtf16LE(currentSave.rawBytes, off, 12, val.trim() || "PLAYER");
     showToast(`Track #${idx+1}: ${tr("toastRecordHolderUpdated", "record holder name saved!")}`);
   }
 }
@@ -1972,7 +1972,7 @@ function webClaimFO1TrackRecords() {
   const name = document.getElementById("ed-nick-input").value.trim() || "PLAYER";
   for (let i = 0; i < 36; i++) {
     const off = 0x190 + i * 52;
-    writeUtf16LE(bytes, off, 24, name);
+    writeUtf16LE(bytes, off, 12, name);
     const inEl = document.getElementById(`fo1-rec-name-${i}`);
     if (inEl) inEl.value = name;
   }
@@ -2210,7 +2210,7 @@ function loadDemoSave(type) {
   if (type === "fo2") {
     const buf = new Uint8Array(16384);
     buf[0] = 0x92;
-    writeUtf16LE(buf, 0x04, 64, "#7Racer");
+    writeUtf16LE(buf, 0x04, 32, "#7Racer");
     const dv = new DataView(buf.buffer);
     dv.setUint32(0x48, 50000, true);
     // Classes
@@ -2248,7 +2248,7 @@ function loadDemoSave(type) {
     FO2_STUNTS.forEach((s) => {
       optDv.setFloat32(s.off, s.defScore, true);
       optDv.setUint32(s.off + 4, s.car, true);
-      writeUtf16LE(optBuf, s.off + 8, 32, "Racer");
+      writeUtf16LE(optBuf, s.off + 8, 16, "Racer");
     });
 
     loadCombinedFO2Saves("player001.sav", buf, "options.sav", optBuf);
@@ -2259,7 +2259,7 @@ function loadDemoSave(type) {
     const dv = new DataView(buf.buffer);
     dv.setUint32(0, 4, true); // length header
     buf[8] = 0x92;
-    writeUtf16LE(buf, 0x0C, 64, "#31CarnagePro");
+    writeUtf16LE(buf, 0x0C, 32, "#31CarnagePro");
     dv.setUint32(0x50, 85000, true);
     // Car 0: CTR in garage
     dv.setUint32(0x24e, 0, true);
@@ -2290,8 +2290,8 @@ function loadDemoSave(type) {
   } else if (type === "fo1") {
     const buf = new Uint8Array(8192);
     buf[0] = 0x90;
-    writeUtf16LE(buf, 0x04, 32, "CLASSIC");
-    writeUtf16LE(buf, 0x62, 32, "CLASSIC");
+    writeUtf16LE(buf, 0x04, 16, "CLASSIC");
+    writeUtf16LE(buf, 0x62, 16, "CLASSIC");
     const dv = new DataView(buf.buffer);
     dv.setUint32(0x84, 35000, true);
     dv.setUint32(0x88, 1, true); // Active car: Pepper
@@ -2310,7 +2310,7 @@ function loadDemoSave(type) {
     dv.setUint32(0xC8, 25000, true);
     // Track records
     for (let i = 0; i < 36; i++) {
-      writeUtf16LE(buf, 0x190 + i * 52, 24, "CLASSIC");
+      writeUtf16LE(buf, 0x190 + i * 52, 12, "CLASSIC");
       dv.setFloat32(0x190 + i * 52 + 24, 42.50, true);
     }
     loadSaveFromBuffer("player001.sav", buf.buffer);
